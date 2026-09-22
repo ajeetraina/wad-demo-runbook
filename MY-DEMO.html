@@ -81,7 +81,8 @@ sbx version</code></pre>
 
 <h3>1. Autonomy needs isolation</h3>
 <ol>
-  <li>Type (terminal 1):<pre><code>sbx run --name wad-coding-factory</code></pre></li>
+  <li>Type (terminal 1) — open the coding agent (brings the sandbox up if needed):<pre><code>./demo agent</code></pre>
+    <span class="note">Raw equivalent, only if the sandbox already exists: sbx run --name wad-coding-factory</span></li>
   <li>Type at the Claude prompt:<pre><code>Describe the project for me.</code></pre></li>
   <li class="say"><b>Say:</b> "Claude runs inside a local microVM. It can build and serve the app, run containers for tests, and update its own tools — all isolated from my laptop."</li>
 </ol>

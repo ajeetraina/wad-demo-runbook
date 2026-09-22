@@ -11,8 +11,9 @@ sbx version
 
 ## 1. Isolation
 ```sh
-sbx run --name wad-coding-factory
+./demo agent
 ```
+(Raw equivalent, only if the sandbox exists: `sbx run --name wad-coding-factory`)
 At Claude prompt:
 ```
 Describe the project for me.

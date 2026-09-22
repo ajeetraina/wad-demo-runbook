@@ -77,10 +77,11 @@ First-time-ever install instead: `sh __INSTALL_ME.sh 3` from the wad26 folder.
 
 ### 1. Autonomy needs isolation
 
-1. Type (terminal 1):
+1. Type (terminal 1) — open the coding agent (brings the sandbox up if needed):
    ```sh
-   sbx run --name wad-coding-factory
+   ./demo agent
    ```
+   (Raw equivalent, only works if the sandbox already exists: `sbx run --name wad-coding-factory`)
 2. Type at the Claude prompt:
    ```
    Describe the project for me.
