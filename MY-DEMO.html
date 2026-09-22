@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WAD Demo — Presenter Pack</title>
+<style>
+  @page { size: Letter; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 4pt; border-bottom: 3px solid #086dd7; padding-bottom: 6pt; color: #086dd7; }
+  h2 { font-size: 14pt; margin: 18pt 0 6pt; background: #086dd7; color: #fff; padding: 4pt 8pt; border-radius: 4px; }
+  h3 { font-size: 12pt; margin: 12pt 0 4pt; color: #0a3d62; border-left: 4px solid #086dd7; padding-left: 8pt; }
+  p { margin: 4pt 0; }
+  ol, ul { margin: 4pt 0 8pt; padding-left: 20pt; }
+  li { margin: 2pt 0; }
+  code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 9.5pt; background: #eef2f6; padding: 1px 4px; border-radius: 3px; }
+  pre { background: #0f1720; color: #e6edf3; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 9pt; line-height: 1.4;
+        padding: 8pt 10pt; border-radius: 5px; overflow: hidden; white-space: pre-wrap; word-break: break-word; page-break-inside: avoid; margin: 4pt 0 8pt; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .note { font-size: 9.5pt; color: #555; font-style: italic; }
+  .say { border-left: 3px solid #37b24d; background: #f2fbf4; padding: 4pt 8pt; margin: 4pt 0; border-radius: 3px; }
+  .real { color: #c92a2a; font-weight: 600; }
+  .legend { background: #fff7e6; border: 1px solid #ffe1a8; padding: 6pt 10pt; border-radius: 5px; font-size: 9.5pt; }
+  .pagebreak { page-break-before: always; }
+  h2, h3 { page-break-after: avoid; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 6pt 0; }
+  th, td { border: 1px solid #cdd6e0; padding: 3pt 6pt; text-align: left; }
+  th { background: #eef2f6; }
+</style>
+</head>
+<body>
+
+<h1>WAD Demo — Presenter Runbook</h1>
+<p class="legend">Numbered script. Each step shows what to <b>Say</b>, <b>Type</b>, and <b>Show</b>.
+Steps 5, 6, 7 are <span class="real">real machine only</span> — they will not work on the legacy/local dry-run.</p>
+
+<h2>Quick Start — Run the demo now</h2>
+<p>Use this when the machine is already set up and you just want to present.</p>
+<ol>
+  <li>Load the pinned sbx (every new terminal):
+    <pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh</code></pre></li>
+  <li>Confirm it's ready:
+    <pre><code>sbx ls
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3001/</code></pre>
+    <span class="note">Expected: wad-coding-factory shows running, and 200.</span></li>
+  <li>Open the app in the browser:
+    <pre><code>open http://127.0.0.1:3001/</code></pre></li>
+  <li>Open the coding agent (present from this terminal):
+    <pre><code>./demo agent</code></pre></li>
+  <li>Inside the Claude prompt, run the network demo:
+    <pre><code>! curl https://github.com/
+! curl https://example.org/</code></pre>
+    <span class="note">GitHub responds; example.org returns a 403 policy denial.</span></li>
+  <li>Optional — show the kit and environment files (second terminal):
+    <pre><code>cat runtime/kits/demo-node/spec.yaml
+cat runtime/sbxenv.yaml</code></pre></li>
+</ol>
+
+<h2>Recovery — if the sandbox is missing or the app returns 000</h2>
+<p>Phases are already "done", so this is a repair (not a first-time setup):</p>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+./demo repair --yes</code></pre>
+<p class="note">Fallback if repair fails: <code>./demo setup --local-only</code>. First-time-ever install instead: <code>sh __INSTALL_ME.sh 3</code> from the wad26 folder.</p>
+
+<div class="pagebreak"></div>
+<h2>Part A — Before you start (once per session)</h2>
+<ol>
+  <li>Open two terminal tabs in the presenter folder:
+    <pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+sbx version</code></pre>
+    <span class="note">sbx version should read v0.45.0-rc2</span>
+  </li>
+  <li>Open browser tabs: http://127.0.0.1:3001/ (app), governance console, cloud console.</li>
+  <li class="say"><b>Say:</b> "Docker is becoming an AI company: give coding agents room to work, make it repeatable, and manage access."</li>
+</ol>
+
+<h2>Part B — The demo (in order)</h2>
+
+<h3>1. Autonomy needs isolation</h3>
+<ol>
+  <li>Type (terminal 1):<pre><code>sbx run --name wad-coding-factory</code></pre></li>
+  <li>Type at the Claude prompt:<pre><code>Describe the project for me.</code></pre></li>
+  <li class="say"><b>Say:</b> "Claude runs inside a local microVM. It can build and serve the app, run containers for tests, and update its own tools — all isolated from my laptop."</li>
+</ol>
+
+<h3>2. Reusable kits and environments</h3>
+<ol>
+  <li>Type (terminal 2):<pre><code>cat runtime/kits/demo-node/spec.yaml
+cat runtime/sbxenv.yaml</code></pre></li>
+  <li class="say"><b>Say:</b> "Kits are reusable packages of tools, config and agent instructions. This Node kit supplies package tooling and declares registry access. The environment file ties kits, workspace, resources and ports together — like Compose. These live next to the project, so the next developer gets the same setup."</li>
+</ol>
+
+<h3>3. A working application</h3>
+<ol>
+  <li>Show: open http://127.0.0.1:3001/ (Incident Review — AI failure field notes)</li>
+  <li class="say"><b>Say:</b> "This app runs inside the sandbox, reachable through a published port. The agent has its own clone of the project; we choose which host directories it can access."</li>
+</ol>
+
+<h3>4. Network and credentials (the key moment)</h3>
+<ol>
+  <li>Type at the Claude prompt ( ! runs a shell command inside the sandbox ):<pre><code>! curl https://github.com/
+! curl https://example.org/</code></pre></li>
+  <li>Show: GitHub returns a response; example.org returns a policy denial (403, "Denied by local rule").</li>
+  <li class="say"><b>Say:</b> "A proxy outside the agent controls network access. GitHub is allowed; example.org is denied by this sandbox's local rule. The same proxy supplies model auth — the agent never sees the API key."</li>
+  <li>Optional contrast: run <code>curl https://example.org/</code> on the host (returns 200) to prove the policy only applies inside the sandbox.</li>
+</ol>
+
+<h3>5. Organization governance <span class="real">(real machine only)</span></h3>
+<ol>
+  <li>Show in the governance browser: network policy, MCP tool allow/deny, and one earlier audit row.</li>
+  <li class="say"><b>Say:</b> "Teams manage access centrally with Docker AI Governance. Here's the org network policy. MCP permissions can allow one tool and deny another through the Sandboxes gateway. The audit log records the resource, decision and time — here's an earlier denial for the same destination."</li>
+</ol>
+
+<h3>6. Cloud Sandboxes <span class="real">(real machine only)</span></h3>
+<ol>
+  <li>Type (terminal 2):<pre><code>sbx --cloud ls
+sbx --cloud attach &lt;prepared-sandbox-id&gt;</code></pre>
+    <span class="note">Match the sticker: 03 uses wad-demo-03-…</span></li>
+  <li class="say"><b>Say:</b> "Adding --cloud runs the sandbox on Docker's infrastructure. Here's one already running — I connect from my terminal and come back to the agent's conversation. The session stays in the cloud when I disconnect."</li>
+</ol>
+
+<h3>7. Pick up the work <span class="real">(real machine only)</span></h3>
+<ol>
+  <li>Type at the cloud Claude prompt:<pre><code>What did you change, and how did the tests go?</code></pre></li>
+  <li>Type to show tests again:<pre><code>! cd /home/agent/wad-cloud-demo &amp;&amp; python3 -m unittest -v</code></pre></li>
+  <li class="say"><b>Say:</b> "We gave this agent a small task earlier. The change and passing tests are here, ready for the next instruction — longer tasks keep running while I'm away."</li>
+</ol>
+
+<h3>8. DHI / Scout supply-chain (works on this machine)</h3>
+<ol>
+  <li>Type — open the security sandbox shell:<pre><code>sbx exec -it wad-dhi-scout bash</code></pre></li>
+  <li>Type inside that shell:<pre><code>export DHI_IMAGE=dhi.io/node@sha256:61b89b9bd1551723b56de57bf41cc62daeffb266d80636a83cf6b85e35bf17d1
+docker run --rm --network none "$DHI_IMAGE" node --version
+docker scout quickview "$DHI_IMAGE"
+docker scout cves --only-severity critical,high "$DHI_IMAGE"</code></pre></li>
+  <li class="say"><b>Say:</b> "The agent has its own Docker Engine. We start from a Docker Hardened Image, and Scout shows packages, vulnerabilities and attestations — information to act on before shipping. The kit tells the agent to run these checks as part of its normal workflow."</li>
+</ol>
+
+<h2>Part C — Reset (between visitors)</h2>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+./demo reset</code></pre>
+
+<h2>Verify anytime</h2>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+./demo check --model</code></pre>
+<p class="note">This machine (legacy dry-run): steps 1–4, 8 and reset work. Steps 5–7 need the provisioned demo/org accounts.</p>
+
+<!-- ============ CHEAT SHEET ============ -->
+<div class="pagebreak"></div>
+<h1>WAD Demo — Commands Cheat Sheet</h1>
+<p class="legend">Commands only, top to bottom. Steps 5–7 need the real provisioned machine.</p>
+
+<h3>Setup (per session)</h3>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+sbx version</code></pre>
+
+<h3>1. Isolation</h3>
+<pre><code>sbx run --name wad-coding-factory</code></pre>
+<p>At Claude prompt: <code>Describe the project for me.</code></p>
+
+<h3>2. Kits and environments</h3>
+<pre><code>cat runtime/kits/demo-node/spec.yaml
+cat runtime/sbxenv.yaml</code></pre>
+
+<h3>3. Working app</h3>
+<pre><code>open http://127.0.0.1:3001/</code></pre>
+
+<h3>4. Network and credentials</h3>
+<p>At Claude prompt:</p>
+<pre><code>! curl https://github.com/
+! curl https://example.org/</code></pre>
+<p>Optional host contrast:</p>
+<pre><code>curl https://example.org/</code></pre>
+
+<h3>5. Governance <span class="real">(real machine only)</span></h3>
+<p>Browser: network policy, MCP allow/deny, one audit row.</p>
+
+<h3>6. Cloud sandboxes <span class="real">(real machine only)</span></h3>
+<pre><code>sbx --cloud ls
+sbx --cloud attach &lt;prepared-sandbox-id&gt;</code></pre>
+
+<h3>7. Pick up the work <span class="real">(real machine only)</span></h3>
+<p>At cloud Claude prompt:</p>
+<pre><code>What did you change, and how did the tests go?</code></pre>
+<pre><code>! cd /home/agent/wad-cloud-demo &amp;&amp; python3 -m unittest -v</code></pre>
+
+<h3>8. DHI / Scout</h3>
+<pre><code>sbx exec -it wad-dhi-scout bash
+export DHI_IMAGE=dhi.io/node@sha256:61b89b9bd1551723b56de57bf41cc62daeffb266d80636a83cf6b85e35bf17d1
+docker run --rm --network none "$DHI_IMAGE" node --version
+docker scout quickview "$DHI_IMAGE"
+docker scout cves --only-severity critical,high "$DHI_IMAGE"</code></pre>
+
+<h3>Reset</h3>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+./demo reset</code></pre>
+
+<h3>Verify</h3>
+<pre><code>cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+./demo check --model</code></pre>
+
+</body>
+</html>

@@ -1,81 +1,74 @@
-# WAD Demo 
+# WAD Demo — Presenter Runbook
 
-Commands only, top to bottom. Steps 5–7 need the real provisioned machine.
+Presenter materials for the **Docker Sandboxes ("Coding Factory") WAD demo**: run a coding agent (Claude) inside an isolated microVM, show a working app, demonstrate network policy, and — on a provisioned machine — governance and Cloud Sandboxes.
 
-## Setup (per session)
+## Contents
+
+| File | What it is |
+|------|------------|
+| [RUNBOOK.md](RUNBOOK.md) | Full step-by-step script — what to **Say / Type / Show** at each step |
+| [CHEATSHEET.md](CHEATSHEET.md) | Commands only, top to bottom — for glancing at mid-demo |
+| [MY-DEMO.pdf](MY-DEMO.pdf) | Printable version of both (runbook + cheat sheet) |
+
+> Steps 5–7 (governance, cloud, pick-up-the-work) need the real provisioned demo machine and are labelled accordingly. Everything else runs locally.
+
+---
+
+## Quick Start — run the demo now
+
+For a machine that's already set up.
+
+1. Load the pinned sbx (every new terminal):
+   ```sh
+   cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+   . runtime/.install-state/env.sh
+   ```
+2. Confirm it's ready:
+   ```sh
+   sbx ls
+   curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3001/
+   ```
+   Expected: `wad-coding-factory` shows `running`, and `200`.
+3. Open the app:
+   ```sh
+   open http://127.0.0.1:3001/
+   ```
+4. Open the coding agent (present from this terminal):
+   ```sh
+   ./demo agent
+   ```
+5. Inside the Claude prompt, run the network demo:
+   ```
+   ! curl https://github.com/
+   ! curl https://example.org/
+   ```
+   GitHub responds; example.org returns a **403 policy denial** (denied by a local rule).
+
+Full narration and the remaining sections are in [RUNBOOK.md](RUNBOOK.md).
+
+---
+
+## Recovery — sandbox missing or app returns `000`
+
+If the machine is already set up (install phases show `done`), this is a repair:
+
 ```sh
 cd /Users/ajeetraina/work/wad26/wad-demo-presenter
 . runtime/.install-state/env.sh
-sbx version
+./demo repair --yes
 ```
 
-## 1. Isolation
-```sh
-sbx run --name wad-coding-factory
-```
-At Claude prompt:
-```
-Describe the project for me.
-```
+- Fallback if repair fails: `./demo setup --local-only`
+- First-time-ever install: `sh __INSTALL_ME.sh 3` from the `wad26` folder (the `3` is the machine's sticker number)
 
-## 2. Kits and environments
-```sh
-cat runtime/kits/demo-node/spec.yaml
-cat runtime/sbxenv.yaml
-```
+---
 
-## 3. Working app
-```sh
-open http://127.0.0.1:3001/
-```
+## First-time setup vs repair (which command)
 
-## 4. Network and credentials
-At Claude prompt:
-```
-! curl https://github.com/
-! curl https://example.org/
-```
-Optional host contrast:
-```sh
-curl https://example.org/
-```
+| Situation | Command |
+|-----------|---------|
+| Brand-new machine, from the ZIP package | `sh __INSTALL_ME.sh 3` (run in `wad26/`; no number = legacy) |
+| Tools installed, prepare demo first time | `./demo setup` (or `--local-only`, or `--supply-chain`) |
+| Already set up, VM disappeared | `./demo repair --yes` |
 
-## 5. Governance (real machine only)
-Browser: network policy, MCP allow/deny, one audit row.
-
-## 6. Cloud sandboxes (real machine only)
-```sh
-sbx --cloud ls
-sbx --cloud attach <prepared-sandbox-id>
-```
-
-## 7. Pick up the work (real machine only)
-At cloud Claude prompt:
-```
-What did you change, and how did the tests go?
-```
-```
-! cd /home/agent/wad-cloud-demo && python3 -m unittest -v
-```
-
-## 8. DHI / Scout
-```sh
-sbx exec -it wad-dhi-scout bash
-export DHI_IMAGE=dhi.io/node@sha256:61b89b9bd1551723b56de57bf41cc62daeffb266d80636a83cf6b85e35bf17d1
-docker run --rm --network none "$DHI_IMAGE" node --version
-docker scout quickview "$DHI_IMAGE"
-docker scout cves --only-severity critical,high "$DHI_IMAGE"
-```
-
-## Reset
-```sh
-cd /Users/ajeetraina/work/wad26/wad-demo-presenter
-./demo reset
-```
-
-## Verify
-```sh
-cd /Users/ajeetraina/work/wad26/wad-demo-presenter
-. runtime/.install-state/env.sh
-./demo check --model
-```
+Check which you are with `./demo status` — phases `done` → repair; phases `pending`/error → first-time setup.
