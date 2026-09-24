@@ -16,6 +16,17 @@ Presenter materials for the **Docker Sandboxes ("Coding Factory") WAD demo**: ru
 
 ## Quick Start — run the demo now
 
+```
+cd /Users/ajeetraina/work/wad26/wad-demo-presenter
+. runtime/.install-state/env.sh
+./demo status          # phases should all show "done"
+sbx ls                 # wad-coding-factory should be "running"
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3001/   # expect 200
+./demo check --model   # confirms model access works
+sbx --cloud ls         # its wad-demo-<sticker>-… sandbox should be listed
+```
+
+
 For a machine that's already set up.
 
 1. Load the pinned sbx (every new terminal):
